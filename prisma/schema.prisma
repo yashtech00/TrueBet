@@ -25,13 +25,16 @@ model User {
 }
 
 model Event {
-  id        String   @id @default(uuid())
-  question  String
-  outcome   String? // YES/No or null if not decided
-  createdAt DateTime @default(now())
-  orders    Order[]
-  trades    Trade[]
+  id         String   @id @default(uuid())
+  title   String
+  description String?
+  closesAt   DateTime
+  outcome    String? // "YES", "NO" or null
+  createdAt  DateTime @default(now())
+  orders     Order[]
+  trades     Trade[]
 }
+
 
 model Order {
   id        String   @id @default(uuid())
