@@ -13,3 +13,46 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  balance      Int     @default(1000) // wallet balance
+  orders       Order[]
+  boughtTrades Trade[] @relation("Buyer")
+  soldTrades   Trade[] @relation("Seller")
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  question  String
+  outcome   String? // YES/No or null if not decided
+  createdAt DateTime @default(now())
+  orders    Order[]
+  trades    Trade[]
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  side      String // "YES" or "NO"
+  price     Int
+  createdAt DateTime @default(now())
+}
+
+model Trade {
+  id        String   @id @default(uuid())
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  buyerId   String
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  sellerId  String
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  price     Int
+  side      String // "YES" or No
+  createdAt DateTime @default(now())
+}
