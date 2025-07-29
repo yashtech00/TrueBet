@@ -1,33 +1,29 @@
-import { useEffect, useState } from "react"
+// app/page.tsx
+import EventCard from "./components/EventCard";
+import { fetchEvents } from "./lib/fetchEvents";
 
-
-interface Event{
-  id:string,
-  title: string,
-  description: string,
-  outcome: string | null,
-  closeAt: string,
-  createdAt:string
-}
-
-export default function Home() {
-  
-  const [event, setEvent] = useState<Event[]>([]);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const res = await fetch("api/events");
-      const data = await res.json();
-      setEvent(data);
-    }
-    fetchEvents();
-  }, []);
-
+export default async function Home() {
+  const events = await fetchEvents();
 
   return (
-    <div>
+    <main className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">🧠 All Prediction Events</h1>
 
-    </div>
-  )
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {events.length > 0 ? (
+          events.map((event: any) => (
+            <EventCard
+              key={event.id}
+              id={event.id}
+              title={event.title}
+              description={event.description}
+              closesAt={event.closesAt}
+            />
+          ))
+        ) : (
+          <p>No events found.</p>
+        )}
+      </div>
+    </main>
+  );
 }
