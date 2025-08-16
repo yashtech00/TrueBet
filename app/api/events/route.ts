@@ -24,6 +24,7 @@ export async function POST(req: Request, res: NextResponse) {
         title,
         description,
         closeAt: new Date(closeAt),
+        outcome: null,
       },
     });
 

@@ -1,3 +1,17 @@
+import { useParams } from "next/navigation"
 
 
-export default fu
+export default function EventPage() {
+
+    const { id } = useParams();
+
+    
+
+
+
+    return (
+        <div>
+
+        </div>
+    )
+}
