@@ -1,5 +1,6 @@
 import { prisma } from "@/app/lib/prisma";
 import { error } from "console";
+import { useSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -11,6 +12,12 @@ const eventSchema = z.object({
 
 export async function POST(req: Request, res: NextResponse) {
   try {
+
+    const { data: session, status } = useSession();
+
+    if (session?.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
 
     const validated = eventSchema.safeParse(body);
@@ -48,6 +55,44 @@ export async function GET() {
     return NextResponse.json(events);
   } catch (e) {
     console.error("Errors fetching events:", e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT (req: Request, res: NextResponse) {
+  try {
+   
+    const body = await req.json();
+    const { id } = body;
+    const event = await prisma.event.findUnique({
+      where: { id },
+      include: {
+        orders: true,
+        trades: true,
+      },
+    });
+    if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+    event.outcome = body.outcome;
+    await prisma.event.update({
+      where: { id },
+      data: event,
+    });
+    await event.save();
+    
+    // const validated = eventSchema.safeParse(body);
+    // if (!validated.success) {
+    //   return NextResponse.json({ error: validated.error }, { status: 400 });
+    // }
+
+    return NextResponse.json(event);
+
+  } catch (e) {
+    console.error(e);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

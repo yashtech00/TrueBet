@@ -18,6 +18,7 @@ model User {
   id           String  @id @default(uuid())
   name         String
   email        String  @unique
+  role         String  @default("USER")
   balance      Int     @default(1000) // wallet balance
   orders       Order[]
   boughtTrades Trade[] @relation("Buyer")
